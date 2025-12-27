@@ -2,39 +2,82 @@ import puppeteerExtra from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 import { websiteToAgent } from './merchants/websites'
 import options from './utils/cli'
+import { getCursor } from './utils/interact'
+import { installMouseHelper } from 'ghost-cursor'
+import { getRandomInterest, getRandomQueryForInterest, type Interest } from './utils/interests'
+import { wait } from './utils/misc'
 
 // Set defaults
 puppeteerExtra.use(StealthPlugin())
 
-
 let browser = await puppeteerExtra.launch({
-	headless : options?.headless,
-	slowMo : options?.slowmo ? 250 : 0
+	headless: options?.headless,
+	slowMo: options?.slowmo ? 250 : undefined
 })
 
-for(let loopIndex = 0 ; loopIndex < options.navigationLoops ; loopIndex++){
+let interests: Interest[] = []
 
-	// for each website
-	for(const websiteURL of options.websites) {
+if (options.randomInterests) {
+	interests.push(getRandomInterest())
+}
 
-		// Create an instance of the websites interface
-		const agent = websiteToAgent[websiteURL]
+if (options.interests) {
+	interests = options.interests
+}
 
-		if(agent === null || agent === undefined){
-			continue
-		}
+for (const interest of interests) {
 
-		let page = await browser.newPage({type : 'tab'})
+	for (let loopIndex = 0; loopIndex < options.navigationLoops; loopIndex++) {
 
-		await agent.navigateToSite(page)
+		// for each website
+		for (const websiteURL of options.websites) {
 
-		// Run navigation events
-		for(let eventIndex = 0; eventIndex < options.eventCount ; eventIndex++){
+			// Create an instance of the websites interface
+			const agent = websiteToAgent[websiteURL]
 
-			await agent.goToSearchbox(page)
-			await agent.searchForItem(page)
-			await agent.addItemToCart(page)
+			if (agent === null || agent === undefined) {
+				continue
+			}
 
+			const page = await browser.newPage({ type: 'tab' })
+
+			// Install mouse helper for debugging
+			await installMouseHelper(page);
+
+			// Set the page's viewport so that we know
+			// where to place our cursor in the future
+			await page.setViewport({
+				width: 960,
+				height: 1080,
+				deviceScaleFactor: 1,
+			})
+
+			// Create a cursor to navigate this site
+			const cursor = getCursor(page)
+
+			await agent.navigateToSite(page, cursor)
+
+			await agent.goToSearchbox(page, cursor)
+
+			// Get a search query
+			const query = getRandomQueryForInterest(interest)
+			await agent.searchForItem(page, cursor, query)
+
+			// Run navigation events
+			for (let eventIndex = 0; eventIndex < options.eventCount; eventIndex++) {
+
+				await agent.clickOnItem(page, cursor, eventIndex)
+
+				// Move randomly while waiting on an item
+				cursor?.toggleRandomMove(true)
+				await wait(10000 + Math.random() * 5000.0); // How many seconds should the wait be? At the very least 10?
+				cursor?.toggleRandomMove(false)
+
+				await page.goBack();
+			}
+
+			// Close the tab when done
+			await page.close();
 		}
 	}
 }
