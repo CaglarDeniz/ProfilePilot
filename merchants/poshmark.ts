@@ -62,11 +62,6 @@ export async function clickOnItem(page: Page, cursor: GhostCursor | null, itemIn
 		return;
 	}
 
-	if (!item) {
-		logger.trace(`Search for item with index ${itemIndex} returned null. Returning...`)
-		return;
-	}
-
 	await randomMoveAndClick(cursor, item)
 }
 
@@ -91,7 +86,7 @@ async function searchForItem(page: Page, cursor: GhostCursor | null, query: Sear
 	await randomMoveAndClick(cursor, searchButton)
 }
 
-const PoshmarkAgent: ProfileAgent = {
+const Poshmark: ProfileAgent = {
 	navigateToSite: navigateToSite,
 	addItemToCart: addItemToCart,
 	goToSearchbox: goToSearchbox,
@@ -99,4 +94,4 @@ const PoshmarkAgent: ProfileAgent = {
 	clickOnItem: clickOnItem
 };
 
-export default PoshmarkAgent
+export default Poshmark

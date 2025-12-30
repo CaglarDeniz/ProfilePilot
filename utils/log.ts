@@ -1,4 +1,4 @@
-import { configure, getConsoleSink, getLogger, getStreamSink } from '@logtape/logtape'
+import { configure, getConsoleSink, getLogger, getStreamSink, jsonLinesFormatter } from '@logtape/logtape'
 import type { FileSink } from 'bun';
 
 // Create a stream sink for logtape's internal errors
@@ -21,7 +21,9 @@ const logtape_stream_sink = new WritableStream({
 // Configure the logger
 await configure({
 	sinks: {
-		console: getConsoleSink(),
+		console: getConsoleSink({
+			formatter: jsonLinesFormatter
+		}),
 		stream: getStreamSink(logtape_stream_sink)
 	},
 	loggers: [
