@@ -21,7 +21,7 @@ async function goToSearchbox(page: Page, cursor: GhostCursor | null) {
 
 export async function clickOnItem(page: Page, cursor: GhostCursor | null, itemIndex: number) {
 
-	const itemSelector = `#search > div.plp_product-list.product-grid > div > div.plp_product-list--grid.plp_product-list__grid--spacing div:nth-child(${itemIndex + 1}) img`
+	const itemSelector = `#search > div.plp_product-list.product-grid > div > div.plp_product-list--grid.plp_product-list__grid--spacing > div:nth-child(${itemIndex + 1}) img`
 	
 	let item : ElementHandle | null = null;
 	try { 

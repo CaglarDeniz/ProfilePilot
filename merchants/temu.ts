@@ -1,3 +1,5 @@
+// Skipping the implementation for temu.com since search and click 
+// functionality is behind a login
 import { ElementHandle, Page } from 'puppeteer'
 import type { ProfileAgent } from './interface'
 import logger from '../utils/log'

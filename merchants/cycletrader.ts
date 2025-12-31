@@ -20,7 +20,7 @@ async function goToSearchbox(page: Page, cursor: GhostCursor | null) {
 
 export async function clickOnItem(page: Page, cursor: GhostCursor | null, itemIndex: number) {
 
-	const itemSelector = `#listings > div:nth-child(2) > div > div.sui-layout-body > div > div.ti-results-container > div.results.per-row-1 article:nth-child(${itemIndex + 1}) img`
+	const itemSelector = `#listings > div:nth-child(2) > div > div.sui-layout-body > div > div.ti-results-container > div.results.per-row-1 > article:nth-child(${itemIndex + 1}) img`
 
 	let item : ElementHandle | null = null
 
