@@ -88,7 +88,7 @@ async function searchForItem(page: Page, cursor: GhostCursor | null, query: Sear
 	// or hitting the Enter key
 }
 
-const DocsWps: ProfileAgent = {
+const MobileLegends: ProfileAgent = {
 	navigateToSite: navigateToSite,
 	addItemToCart: addItemToCart,
 	goToSearchbox: goToSearchbox,
@@ -96,5 +96,5 @@ const DocsWps: ProfileAgent = {
 	clickOnItem: clickOnItem
 };
 
-export default DocsWps
+export default MobileLegends
 
