@@ -1,6 +1,5 @@
 #! /usr/bin/env fish
 bun run index.ts \
-	--websites "https://poshmark.com" \
-	--interests "sports" \
+	--interests "basketball_sneakers" \
 	-n 1 \
-	-e 10 
+	-e 5 

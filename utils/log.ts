@@ -1,5 +1,8 @@
+import { AsyncLocalStorage } from 'node:async_hooks'
 import { configure, getConsoleSink, getLogger, getStreamSink, jsonLinesFormatter } from '@logtape/logtape'
 import type { FileSink } from 'bun';
+
+const logContextStorage = new AsyncLocalStorage<Record<string,unknown>>();
 
 // Create a stream sink for logtape's internal errors
 let logtape_sink_file: FileSink | undefined = undefined;
@@ -29,7 +32,8 @@ await configure({
 	loggers: [
 		{ category: ['merchantScripts'], lowestLevel: 'trace', sinks: ["console"] },
 		{ category: ['logtape', 'meta'], lowestLevel: 'warning', sinks: ["stream"] }
-	]
+	],
+	contextLocalStorage : logContextStorage
 })
 
 const logger = getLogger(["merchantScripts"])

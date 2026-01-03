@@ -42,8 +42,6 @@ export async function randomMove(cursor: GhostCursor | null, el: ElementHandle |
 		return
 	}
 
-	// await cursor.scrollIntoView(el); // Not using GhostCursor.scrollIntoView cause it seems to not do anything for me
-	
 	el.evaluate((el : Element) => {
 		el.scrollIntoView({
 			behavior : 'smooth',
