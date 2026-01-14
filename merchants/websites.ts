@@ -26,7 +26,7 @@ export type Website = "https://poshmark.com" |
 	"https://shutterstock.com" |
 	"https://slickdeals.net" |
 	"https://ssactivewear.com" |
-	"https://study.com"
+	"https://study.com" 
 
 export const websiteToAgent: Record<Website, ProfileAgent> = {
 	"https://poshmark.com": Poshmark, // a general department store, focused mostly on clothing and shoes
@@ -35,7 +35,7 @@ export const websiteToAgent: Record<Website, ProfileAgent> = {
 	"https://gap.com": Gap, // a clothing store
 	"https://oldnavy.gap.com": OldNavyGap, // a clothing store
 	"https://overstock.com": OverStock, // bathroom products
-	"https://wwww.priceshoes.com": PriceShoes, // shoes
+	"https://www.priceshoes.com": PriceShoes, // shoes
 	"https://www.rentalcars.com": RentalCars, // rental cars
 	"https://shein.com": Shein, // anything and everything
 	"https://shutterstock.com": ShutterStock, // stock photographs,icons and videos

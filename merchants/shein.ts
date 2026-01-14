@@ -7,7 +7,7 @@ import type { SearchQuery } from '../utils/interests'
 
 async function navigateToSite(page: Page, cursor: GhostCursor | null) {
 	logger.trace('Navigating to https://www.temu.com')
-	await page.goto('https://wwww.temu.com', { waitUntil: 'networkidle2' })
+	await page.goto('https://www.temu.com', { waitUntil: 'networkidle2' })
 }
 
 async function addItemToCart(page: Page, cursor: GhostCursor | null) {

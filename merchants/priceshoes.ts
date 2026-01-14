@@ -8,8 +8,8 @@ import { gaussianRandom } from '../utils/misc'
 import { TYPE_DELAY_MEAN, TYPE_DELAY_STDDEV } from '../utils/constants'
 
 async function navigateToSite(page: Page, cursor: GhostCursor | null) {
-	logger.trace("Navigating to site", { site: "https://wwww.priceshoes.com" });
-	await page.goto('https://wwww.priceshoes.com', { waitUntil: 'networkidle2' })
+	logger.trace("Navigating to site", { site: "https://www.priceshoes.com" });
+	await page.goto('https://www.priceshoes.com', { waitUntil: 'networkidle2' })
 }
 
 async function addItemToCart(page: Page, cursor: GhostCursor | null) {

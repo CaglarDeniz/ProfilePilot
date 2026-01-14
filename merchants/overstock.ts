@@ -6,8 +6,8 @@ import { randomMoveAndClick, randomMoveAndInput } from '../utils/interact'
 import type { SearchQuery } from '../utils/interests'
 
 async function navigateToSite(page: Page, cursor: GhostCursor | null) {
-	logger.trace("Navigating to site",{site : "https://wwww.overstock.com"});
-	await page.goto('https://wwww.overstock.com', { waitUntil : 'networkidle2'})
+	logger.trace("Navigating to site",{site : "https://www.overstock.com"});
+	await page.goto('https://www.overstock.com', { waitUntil : 'networkidle2'})
 
 	// Dismiss the sign up offer
 	const signupBoxSelector = '#cl-dialog-close-mcp'

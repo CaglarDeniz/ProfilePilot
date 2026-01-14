@@ -6,8 +6,8 @@ import { randomMoveAndClick, randomMoveAndInput } from '../utils/interact'
 import type { SearchQuery } from '../utils/interests'
 
 async function navigateToSite(page: Page, cursor: GhostCursor | null) {
-	logger.trace("Navigating to site",{site : "https://wwww.rentalcars.com"});
-	await page.goto('https://wwww.rentalcars.com', { waitUntil : 'networkidle2'})
+	logger.trace("Navigating to site",{site : "https://www.rentalcars.com"});
+	await page.goto('https://www.rentalcars.com', { waitUntil : 'networkidle2'})
 }
 
 async function addItemToCart(page: Page, cursor: GhostCursor | null) {

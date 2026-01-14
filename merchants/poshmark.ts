@@ -4,6 +4,35 @@ import logger from '../utils/log'
 import type { GhostCursor } from 'ghost-cursor'
 import { randomMoveAndClick, randomMoveAndInput } from '../utils/interact'
 import type { SearchQuery } from '../utils/interests'
+import { currentProfile } from '../utils/profile'
+
+async function login(page : Page, cursor : GhostCursor | null){
+
+	const loginButtonSelector = '#app > header > nav > div > div > a:nth-child(1)'
+	const login = await page.waitForSelector(loginButtonSelector)
+
+	if(!login) {
+		logger.trace("Couldn't find login button on screen. Aborting...")
+		return
+	}
+
+	await randomMoveAndClick(cursor,login)
+
+	const usernameFieldSelector = '#login_form_username_email'
+	const usernameField = await page.waitForSelector(usernameFieldSelector)
+
+	const passwordFieldSelector = '#login_form_password'
+	const passwordField = await page.waitForSelector(passwordFieldSelector)
+
+	await randomMoveAndInput(page,cursor,usernameField,currentProfile.email)
+	await randomMoveAndInput(page,cursor,passwordField,currentProfile.password)
+
+	const submitButtonSelector = '#email-login-form > form > div.form__actions.br--none.p--t--0.jc--sb.fw--w > button'
+	const submitButton = await page.waitForSelector(submitButtonSelector)
+
+	await randomMoveAndClick(cursor,submitButton)
+
+}
 
 async function navigateToSite(page: Page, cursor: GhostCursor | null) {
 	logger.trace("Navigating to https://poshmark.com")
@@ -87,6 +116,7 @@ async function searchForItem(page: Page, cursor: GhostCursor | null, query: Sear
 }
 
 const Poshmark: ProfileAgent = {
+	login : login,
 	navigateToSite: navigateToSite,
 	addItemToCart: addItemToCart,
 	goToSearchbox: goToSearchbox,

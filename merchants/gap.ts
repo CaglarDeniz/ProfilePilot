@@ -4,10 +4,48 @@ import logger from '../utils/log'
 import type { GhostCursor } from 'ghost-cursor'
 import { randomMoveAndClick, randomMoveAndInput } from '../utils/interact'
 import type { SearchQuery } from '../utils/interests'
+import { currentProfile } from '../utils/profile'
 
+async function login(page : Page, cursor : GhostCursor | null){
+
+	const hamburgerMenuSelector = '#hamburgerNavWrapper'
+	const hamburgerMenu = await page.waitForSelector(hamburgerMenuSelector)
+
+	await randomMoveAndClick(cursor,hamburgerMenu)
+
+	const loginButtonSelector = '#fds_drawer-_r_1_ > div > div.fds_drawer__header-container.fds_drawer__header-container--header-only > div > div > div > span > a:nth-child(1)'
+	const login = await page.waitForSelector(loginButtonSelector)
+
+	if(!login) {
+		logger.trace("Couldn't find login button on screen. Aborting...")
+		return
+	}
+
+	await randomMoveAndClick(cursor,login)
+
+	const usernameFieldSelector = '#verify-email-input'
+	const usernameField = await page.waitForSelector(usernameFieldSelector)
+	await randomMoveAndInput(page,cursor,usernameField,currentProfile.email)
+
+	const continueButtonSelector = '#main-content > div > div > div > div:nth-child(3) > form > div > div > button'
+	const continueButton = await page.waitForSelector(continueButtonSelector)
+
+	await randomMoveAndClick(cursor,continueButton)
+
+	const passwordFieldSelector = '#password-input'
+	const passwordField = await page.waitForSelector(passwordFieldSelector)
+
+	await randomMoveAndInput(page,cursor,passwordField,currentProfile.password)
+
+	const submitButtonSelector = '#main-content > div > div > div > div:nth-child(3) > form > div > div.relative > div.relative.mx-auto.w-\[343px\] > button'
+	const submitButton = await page.waitForSelector(submitButtonSelector)
+
+	await randomMoveAndClick(cursor,submitButton)
+
+}
 async function navigateToSite(page: Page, cursor: GhostCursor | null) {
-	logger.trace("Navigating to site",{site : "https://wwww.gap.com"});
-	await page.goto('https://wwww.gap.com', { waitUntil : 'networkidle2'})
+	logger.trace("Navigating to site",{site : "https://www.gap.com"});
+	await page.goto('https://www.gap.com', { waitUntil : 'networkidle2'})
 }
 
 async function addItemToCart(page: Page, cursor: GhostCursor | null) {
@@ -60,6 +98,7 @@ async function searchForItem(page: Page, cursor: GhostCursor | null, query: Sear
 }
 
 const Gap: ProfileAgent = {
+	login : login,
 	navigateToSite: navigateToSite,
 	addItemToCart: addItemToCart,
 	goToSearchbox: goToSearchbox,
