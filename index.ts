@@ -7,6 +7,8 @@ import { installMouseHelper } from 'ghost-cursor'
 import { getRandomInterest, getRandomQueryForInterest, interestToWebsite, type Interest } from './utils/interests'
 import { wait } from './utils/misc'
 import { withContext } from '@logtape/logtape'
+import { currentProfile } from './utils/profile'
+import logger from './utils/log'
 
 // Set defaults
 puppeteerExtra.use(StealthPlugin())
@@ -40,6 +42,7 @@ for (const interest of interests) {
 				interest: interest,
 				loopIndex: loopIndex,
 				website: websiteURL,
+				victimProfile: currentProfile
 			}, async () => {
 
 				// Create an instance of the websites interface
@@ -65,32 +68,40 @@ for (const interest of interests) {
 				// Create a cursor to navigate this site
 				const cursor = getCursor(page)
 
-				await agent.navigateToSite(page, cursor)
+				try {
 
-				await agent.goToSearchbox(page, cursor)
+					await agent.navigateToSite(page, cursor)
 
-				// Get a search query
-				const query = getRandomQueryForInterest(interest)
-				await agent.searchForItem(page, cursor, query)
+					await agent.login(page, cursor);
 
-				// Run navigation events
-				for (let eventIndex = 0; eventIndex < options.eventCount; eventIndex++) {
+					await agent.goToSearchbox(page, cursor)
 
-					await withContext({ query : query,eventIndex: eventIndex,itemIndex : eventIndex }, async () => {
+					// Get a search query
+					const query = getRandomQueryForInterest(interest)
+					await agent.searchForItem(page, cursor, query)
 
-						await agent.clickOnItem(page, cursor, eventIndex)
+					// Run navigation events
+					for (let eventIndex = 0; eventIndex < options.eventCount; eventIndex++) {
 
-						// Move randomly while waiting on an item
-						cursor?.toggleRandomMove(true)
-						await wait(10000 + Math.random() * 5000.0); // How many seconds should the wait be? At the very least 10?
-						cursor?.toggleRandomMove(false)
+						await withContext({ query: query, eventIndex: eventIndex, itemIndex: eventIndex }, async () => {
 
-						await page.goBack();
-					})
+							await agent.clickOnItem(page, cursor, eventIndex)
+
+							// Move randomly while waiting on an item
+							cursor?.toggleRandomMove(true)
+							await wait(10000 + Math.random() * 5000.0); // How many seconds should the wait be? At the very least 10?
+							cursor?.toggleRandomMove(false)
+
+							await page.goBack();
+						})
+					}
+
+					// Close the tab when done
+					await page.close();
+				} catch (err) {
+					logger.error(`Encountered error while interacting with website. Moving on...`, { error: err })
+					return
 				}
-
-				// Close the tab when done
-				await page.close();
 			})
 		}
 

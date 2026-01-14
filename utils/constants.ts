@@ -48,30 +48,27 @@ export const keyboardNeighbors = {
 export type KeyboardNeighbors = typeof keyboardNeighbors
 
 export const shiftChars = {
-  '`': '~',  // Backtick -> Tilde
-  '1': '!',  // 1 -> Exclamation mark
-  '2': '@',  // 2 -> At symbol
-  '3': '#',  // 3 -> Hash symbol
-  '4': '$',  // 4 -> Dollar symbol
-  '5': '%',  // 5 -> Percent symbol
-  '6': '^',  // 6 -> Caret symbol
-  '7': '&',  // 7 -> Ampersand
-  '8': '*',  // 8 -> Asterisk
-  '9': '(',  // 9 -> Left parenthesis
-  '0': ')',  // 0 -> Right parenthesis
-  '-': '_',  // Hyphen -> Underscore
-  '=': '+',  // Equal sign -> Plus
-  '[': '{',  // Left square bracket -> Left curly brace
-  ']': '}',  // Right square bracket -> Right curly brace
-  '\\': '|', // Backslash -> Pipe
-  ';': ':',  // Semicolon -> Colon
-  "'": '"',  // Apostrophe -> Quotation mark
-  ',': '<',  // Comma -> Less than
-  '.': '>',  // Period -> Greater than
-  '/': '?',  // Slash -> Question mark
-  '(': ')',  // Left parenthesis -> Right parenthesis
-  ')': '(',  // Right parenthesis -> Left parenthesis
+	'~': '`',  // Backtick -> Tilde
+	'!': '1',  // 1 -> Exclamation mark
+	'@': '2',  // 2 -> At symbol
+	'#': '3',  // 3 -> Hash symbol
+	'$': '4',  // 4 -> Dollar symbol
+	'%': '5',  // 5 -> Percent symbol
+	'^': '6',  // 6 -> Caret symbol
+	'&': '7',  // 7 -> Ampersand
+	'*': '8',  // 8 -> Asterisk
+	'(': '9',  // 9 -> Left parenthesis
+	')': '0',  // 0 -> Right parenthesis
+	'_': '-',  // Hyphen -> Underscore
+	'+': '=',  // Equal sign -> Plus
+	'{': '[',  // Left square bracket -> Left curly brace
+	'}': ']',  // Right square bracket -> Right curly brace
+	'|': '\\', // Backslash -> Pipe
+	':': ';',  // Semicolon -> Colon
+	'\'': '"',  // Apostrophe -> Quotation mark
+	'<': ',',  // Comma -> Less than
+	'>': '.',  // Period -> Greater than
+	'?': '/',  // Slash -> Question mark
 };
 
 export type ShiftChars = typeof shiftChars
-

@@ -1,9 +1,9 @@
-import type { ElementHandle, Page, Viewport } from "puppeteer";
+import type { ElementHandle, KeyInput, Page, Viewport } from "puppeteer";
 import { createCursor, type GhostCursor } from 'ghost-cursor'
 import options from './cli'
 import logger from "./log";
 import { bernoulliTrials, discreteUniformRandom, gaussianRandom, isLowerCase, isUpperCase, wait } from "./misc";
-import { keyboardNeighbors, shiftChars, TYPE_DELAY_MEAN, TYPE_DELAY_STDDEV, type KeyboardNeighbors, type ShiftChars } from "./constants";
+import { keyboardNeighbors, requiresShift, shiftChars, TYPE_DELAY_MEAN, TYPE_DELAY_STDDEV, type KeyboardNeighbors, type RequiresShift, type ShiftChars } from "./constants";
 
 export function getCursor(page: Page): GhostCursor | null {
 
@@ -91,7 +91,7 @@ export async function humanType(page: Page, el: ElementHandle, input_str: string
 		up,
 		down
 	}
-	const shiftState: ShiftState = ShiftState.up
+	let shiftState: ShiftState = ShiftState.up
 
 	// Create an Bernouilli random variables the same length
 	// as the input string to randomly make "mistakes" with probability 15%
@@ -102,9 +102,9 @@ export async function humanType(page: Page, el: ElementHandle, input_str: string
 		const char = input_str[charIdx] as string;
 		const charKey = char.toLowerCase() as keyof KeyboardNeighbors
 
-		// If it's time to make a mistake, make a mistake
 		const delay = gaussianRandom(TYPE_DELAY_MEAN, TYPE_DELAY_STDDEV)
 
+		// If it's time to make a mistake, make a mistake
 		if (mistake[charIdx] === 1 && keyboardNeighbors[charKey] !== undefined ) {
 
 			const randomIdx = discreteUniformRandom(0, keyboardNeighbors[charKey].length - 1)
@@ -120,31 +120,34 @@ export async function humanType(page: Page, el: ElementHandle, input_str: string
 		}
 
 		else if (shiftState !== ShiftState.down as ShiftState
-			&& shiftChars[char as keyof ShiftChars]) {
+			&& shiftChars[(char as keyof ShiftChars)])  {
 			// If this is the first time an upper case character is 
 			// being typed. Press the shift key after some delay and then type the character
 
 			await wait(delay + Math.random() * 10.0)
 			await page.keyboard.down('Shift')
+			shiftState = ShiftState.down
 
 			// We type the key on the keyboard
 			// that prints the desired character when shift is held down
-			await el.type(shiftChars[char as keyof ShiftChars], { delay: delay })
+			await el.press(char as KeyInput, { delay : delay})
 		}
 
 		else if (shiftState === ShiftState.down as ShiftState
-			&& !shiftChars[char as keyof ShiftChars]) {
+			&& !shiftChars[(char as keyof ShiftChars)]) {
 			// If shift is pressed and this isn't a character that requires a shift press
 			// lift your finger off of shift
 			await wait(delay + Math.random() * 10.0)
-			await page.keyboard.up('Shift')
 
-			await el.type(char, { delay: delay })
+			await page.keyboard.up('Shift')
+			shiftState = ShiftState.up
+
+			await el.press(char as KeyInput, { delay: delay })
 		}
 
 		else {
 			// If none of the above apply, just send the character over after some delay
-			await el.type(char, { delay: delay })
+			await el.press(char as KeyInput, { delay: delay })
 		}
 	}
 }

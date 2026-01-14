@@ -15,6 +15,13 @@ cli
 	.option('--wait-for-click', 'set the number of milliseconds to wait between mouse down and mouse up events',"100")
 	.requiredOption('-i --interests [interests...]','set a predetermined list of interests to build a profile around',[])
 	.option('--random_interests','selects a set of random interest to build a profile around')
+	.option('--victim_name <string>','sets the name for the current victim profile','John Doe')
+	.option('--victim_first_name <string>','sets the first name for the current victim profile','John')
+	.option('--victim_last_name <string>','sets the last name for the current victim profile','Doe')
+	.option('--victim_email <string>','sets the email for the current victim profile','johndoe@gmail.com')
+	.option('--victim_username <string>','sets the username for the current victim profile','johndoe')
+	.option('--victim_password <string>','sets the password for the current victim profile','johndoe1234')
+	.option('--victim_country <string>','sets the country for the current victim profile','United States')
 
 cli.parse(process.argv)
 
