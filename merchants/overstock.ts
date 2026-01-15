@@ -4,6 +4,46 @@ import logger from '../utils/log'
 import type { GhostCursor } from 'ghost-cursor'
 import { randomMoveAndClick, randomMoveAndInput } from '../utils/interact'
 import type { SearchQuery } from '../utils/interests'
+import { currentProfile } from '../utils/profile'
+
+/*
+ * https://www.overstock.com
+ * This website has an interesting approach to anti-bot defenses
+ *
+ * I believe they randomize the CSS class names that they assign to important elements
+ *
+ * This results in hardcoded/saved CSS selectors to fail when trying to use for 
+ * certain workflows.
+ *
+ * I have currently overcome this issue using nth-child based selectors since they're not dependent on the class selector (.)
+ *
+ * I assume they have deliberately employed a ton of class names for each element to 
+ * entice CSS selector creation algorithms to use the class selector as a shortcut way
+ * to get the minimal selector referring to the element
+	*/
+
+async function login(page : Page, cursor : GhostCursor | null) {
+
+	const accountButtonSelector = '#container > div:nth-child(6)> a > svg'
+	const accountButton = await page.waitForSelector(accountButtonSelector)
+
+	await randomMoveAndClick(cursor,accountButton)
+
+	const emailBoxSelector = '#login-email'
+	const emailBox = await page.waitForSelector(emailBoxSelector)
+
+	await randomMoveAndInput(page,cursor,emailBox,currentProfile.email)
+
+	const passwordBoxSelector = '#login-password'
+	const passwordBox = await page.waitForSelector(passwordBoxSelector)
+
+	await randomMoveAndInput(page,cursor,passwordBox,currentProfile.password)
+
+	const signInButtonSelector = '#container > div > div:nth-child(3) > form > button'
+	const signInButton = await page.waitForSelector(signInButtonSelector)
+
+	await randomMoveAndClick(cursor,signInButton)
+}
 
 async function navigateToSite(page: Page, cursor: GhostCursor | null) {
 	logger.trace("Navigating to site",{site : "https://www.overstock.com"});
@@ -75,6 +115,7 @@ async function searchForItem(page: Page, cursor: GhostCursor | null, query: Sear
 }
 
 const OverStock: ProfileAgent = {
+	login : login,
 	navigateToSite: navigateToSite,
 	addItemToCart: addItemToCart,
 	goToSearchbox: goToSearchbox,

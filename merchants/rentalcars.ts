@@ -5,6 +5,16 @@ import type { GhostCursor } from 'ghost-cursor'
 import { randomMoveAndClick, randomMoveAndInput } from '../utils/interact'
 import type { SearchQuery } from '../utils/interests'
 
+async function login(page : Page, cursor : GhostCursor | null){
+
+	// This website does not have the concept of an account
+	// They only allow bookings to be managed with an email 
+	// address and a reservation code
+	//
+	// Therefore it doesn't make any sense to create an account for this one
+
+}
+
 async function navigateToSite(page: Page, cursor: GhostCursor | null) {
 	logger.trace("Navigating to site",{site : "https://www.rentalcars.com"});
 	await page.goto('https://www.rentalcars.com', { waitUntil : 'networkidle2'})
@@ -68,6 +78,7 @@ async function searchForItem(page: Page, cursor: GhostCursor | null, query: Sear
 }
 
 const RentalCars: ProfileAgent = {
+	login : login,
 	navigateToSite: navigateToSite,
 	addItemToCart: addItemToCart,
 	goToSearchbox: goToSearchbox,

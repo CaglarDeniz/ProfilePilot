@@ -99,7 +99,7 @@ for (const interest of interests) {
 					// Close the tab when done
 					await page.close();
 				} catch (err) {
-					logger.error(`Encountered error while interacting with website. Moving on...`, { error: err })
+					logger.error(`Encountered error while interacting with website. Moving on...`, { error: err, stack : (err as any)?.stack })
 					return
 				}
 			})

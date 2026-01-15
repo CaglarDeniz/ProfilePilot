@@ -7,6 +7,14 @@ import type { SearchQuery } from '../utils/interests'
 import { gaussianRandom } from '../utils/misc'
 import { TYPE_DELAY_MEAN, TYPE_DELAY_STDDEV } from '../utils/constants'
 
+async function login(page : Page, cursor : GhostCursor | null){
+
+	// This website requires a paid membership, and therefore it's probably
+	// not worth making a login flow for. It's won't work without getting the
+	// membership
+
+}
+
 async function navigateToSite(page: Page, cursor: GhostCursor | null) {
 	logger.trace("Navigating to site", { site: "https://www.priceshoes.com" });
 	await page.goto('https://www.priceshoes.com', { waitUntil: 'networkidle2' })
@@ -70,6 +78,7 @@ async function searchForItem(page: Page, cursor: GhostCursor | null, query: Sear
 }
 
 const PriceShoes: ProfileAgent = {
+	login : login,
 	navigateToSite: navigateToSite,
 	addItemToCart: addItemToCart,
 	goToSearchbox: goToSearchbox,
