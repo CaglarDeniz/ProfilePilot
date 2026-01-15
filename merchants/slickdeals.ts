@@ -2,7 +2,7 @@ import { ElementHandle, Page } from 'puppeteer'
 import type { ProfileAgent } from './interface'
 import logger from '../utils/log'
 import type { GhostCursor } from 'ghost-cursor'
-import { randomMoveAndClick, randomMoveAndInput } from '../utils/interact'
+import { randomMoveAndClick, randomMoveAndInput, randomWait } from '../utils/interact'
 import type { SearchQuery } from '../utils/interests'
 
 async function navigateToSite(page: Page, cursor: GhostCursor | null) {
@@ -42,6 +42,8 @@ export async function clickOnItem(page: Page, cursor: GhostCursor | null, itemIn
 	} 
 
 	await randomMoveAndClick(cursor,item);
+	await randomWait(cursor)
+	await page.goBack()
 }
 
 async function searchForItem(page: Page, cursor: GhostCursor | null, query: SearchQuery | null) {

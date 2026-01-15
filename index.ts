@@ -86,13 +86,6 @@ for (const interest of interests) {
 						await withContext({ query: query, eventIndex: eventIndex, itemIndex: eventIndex }, async () => {
 
 							await agent.clickOnItem(page, cursor, eventIndex)
-
-							// Move randomly while waiting on an item
-							cursor?.toggleRandomMove(true)
-							await wait(10000 + Math.random() * 5000.0); // How many seconds should the wait be? At the very least 10?
-							cursor?.toggleRandomMove(false)
-
-							await page.goBack();
 						})
 					}
 

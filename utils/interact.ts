@@ -61,6 +61,18 @@ export async function randomMove(cursor: GhostCursor | null, el: ElementHandle |
 	await cursor.move(el)
 }
 
+export async function randomWait(cursor: GhostCursor | null) {
+	if (!cursor) {
+		logger.trace('Bad cursor passed into randomWait', { cursor: cursor })
+		return
+	}
+
+	// Move randomly while waiting on an item
+	cursor?.toggleRandomMove(true)
+	await wait(10000 + Math.random() * 5000.0); // How many seconds should the wait be? At the very least 10?
+	cursor?.toggleRandomMove(false)
+}
+
 export async function randomMoveAndClick(cursor: GhostCursor | null, el: ElementHandle | null) {
 
 	if (!cursor || !el) {

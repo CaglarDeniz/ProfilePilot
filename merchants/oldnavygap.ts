@@ -3,7 +3,7 @@ import { ElementHandle, Page } from 'puppeteer'
 import type { ProfileAgent } from './interface'
 import logger from '../utils/log'
 import type { GhostCursor } from 'ghost-cursor'
-import { randomMoveAndClick, randomMoveAndInput } from '../utils/interact'
+import { randomMoveAndClick, randomMoveAndInput, randomWait } from '../utils/interact'
 import type { SearchQuery } from '../utils/interests'
 import { currentProfile } from '../utils/profile'
 
@@ -71,10 +71,8 @@ export async function clickOnItem(page: Page, cursor: GhostCursor | null, itemIn
 
 	await randomMoveAndClick(cursor,item);
 
-	// For Old Navy, any click on an item has a redirect, so we wait for network to be idle and then go back one page.
-	// This makes sure that the main loop can return to the search results page
-	await page.waitForNetworkIdle();
-	await page.goBack();
+	await randomWait(cursor)
+	await page.goBack()
 }
 
 async function searchForItem(page: Page, cursor: GhostCursor | null, query: SearchQuery | null) {
