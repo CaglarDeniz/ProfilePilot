@@ -1,32 +1,37 @@
 import type { ElementHandle, KeyInput, Page, Viewport } from "puppeteer";
-import { createCursor, type GhostCursor } from 'ghost-cursor'
+import { GhostCursor } from 'ghost-cursor'
 import options from './cli'
 import logger from "./log";
 import { bernoulliTrials, discreteUniformRandom, gaussianRandom, isLowerCase, isUpperCase, wait } from "./misc";
-import { keyboardNeighbors, requiresShift, shiftChars, TYPE_DELAY_MEAN, TYPE_DELAY_STDDEV, type KeyboardNeighbors, type RequiresShift, type ShiftChars } from "./constants";
+import { keyboardNeighbors, shiftChars, TYPE_DELAY_MEAN, TYPE_DELAY_STDDEV, type KeyboardNeighbors, type ShiftChars } from "./constants";
+import { element2selector as elementToSelector } from "puppeteer-element2selector";
 
 export function getCursor(page: Page): GhostCursor | null {
 
 	const view: Viewport | null = page.viewport()
 
 	return view ?
-		createCursor(page, {
-			x: Math.floor(Math.random() * view.width / 2),
-			y: Math.floor(Math.random() * view.height / 2)
-		}, false, {
-			move: { // move options
-				moveDelay: options.moveDelay + Math.random() * 10,
-				randomizeMoveDelay: true,
-				paddingPercentage: 50,
-				maxTries : 100,
+		new GhostCursor(page, {
+			start: {
+				x: Math.floor(Math.random() * view.width / 2),
+				y: Math.floor(Math.random() * view.height / 2)
 			},
-			click: { // click options
-				hesitate: options.hesitate + Math.random() * 10,
-				waitForClick: options.waitForClick + Math.random() * 10
-			},
-			scroll: {
-				scrollDelay: 100,
-				scrollSpeed: 60
+			performRandomMoves: false,
+			defaultOptions: {
+				move: { // move options
+					moveDelay: options.moveDelay + Math.random() * 10,
+					randomizeMoveDelay: true,
+					paddingPercentage: 50,
+					maxTries: 100,
+				},
+				click: { // click options
+					hesitate: options.hesitate + Math.random() * 10,
+					waitForClick: options.waitForClick + Math.random() * 10
+				},
+				scroll: {
+					scrollDelay: 100,
+					scrollSpeed: 60
+				}
 			}
 		})
 		: null
@@ -42,31 +47,34 @@ export async function randomMove(cursor: GhostCursor | null, el: ElementHandle |
 		return
 	}
 
-	el.evaluate((el : Element) => {
+	logger.trace(`Scrolling element into view`, { element: await elementToSelector(el), url: el.frame.page().url() })
+
+	el.evaluate((el: Element) => {
 		el.scrollIntoView({
-			behavior : 'smooth',
-			block : 'center'
+			behavior: 'smooth',
+			block: 'center'
 		})
 	})
 
-	logger.trace(`Scrolling element into view : ${el.toString()}`)
+	logger.trace(`Moving to element`, { element: await elementToSelector(el), url: el.frame.page().url() })
 
 	await cursor.move(el)
-	logger.trace(`Moving to element : ${el.toString()}`)
 }
 
 export async function randomMoveAndClick(cursor: GhostCursor | null, el: ElementHandle | null) {
 
 	if (!cursor || !el) {
-		logger.trace(`Invalid input into randomMoveAndClick : ${cursor},${el}`)
+		logger.trace('Invalid input into randomMoveAndClick', { cursor: cursor, element: el })
 		return
 	}
+
+	logger.trace('Clicking on element', { element: await elementToSelector(el), url: el.frame.page().url() })
+
 	// Move to the element
 	await randomMove(cursor, el)
 
 	// Click on element
 	await cursor.click(el)
-	logger.trace(`Clicking on element : ${el.toString()}`)
 }
 
 export async function randomMoveAndInput(page: Page, cursor: GhostCursor | null, el: ElementHandle | null, input_str: string) {
@@ -76,13 +84,14 @@ export async function randomMoveAndInput(page: Page, cursor: GhostCursor | null,
 		return
 	}
 
+	logger.trace(`Typing ${input_str} into element`, { element: await elementToSelector(el), url: el.frame.page().url() })
+
 	// Move to the element
 	await randomMove(cursor, el)
 
 	// Type like a human would
 	await humanType(page, el, input_str)
 
-	logger.trace(`Typing ${input_str} into element : ${el.toString()}`)
 }
 
 export async function humanType(page: Page, el: ElementHandle, input_str: string) {
@@ -105,7 +114,7 @@ export async function humanType(page: Page, el: ElementHandle, input_str: string
 		const delay = gaussianRandom(TYPE_DELAY_MEAN, TYPE_DELAY_STDDEV)
 
 		// If it's time to make a mistake, make a mistake
-		if (mistake[charIdx] === 1 && keyboardNeighbors[charKey] !== undefined ) {
+		if (mistake[charIdx] === 1 && keyboardNeighbors[charKey] !== undefined) {
 
 			const randomIdx = discreteUniformRandom(0, keyboardNeighbors[charKey].length - 1)
 			const randomChar = keyboardNeighbors[charKey][randomIdx] as string
@@ -120,7 +129,7 @@ export async function humanType(page: Page, el: ElementHandle, input_str: string
 		}
 
 		else if (shiftState !== ShiftState.down as ShiftState
-			&& shiftChars[(char as keyof ShiftChars)])  {
+			&& shiftChars[(char as keyof ShiftChars)]) {
 			// If this is the first time an upper case character is 
 			// being typed. Press the shift key after some delay and then type the character
 
@@ -130,7 +139,7 @@ export async function humanType(page: Page, el: ElementHandle, input_str: string
 
 			// We type the key on the keyboard
 			// that prints the desired character when shift is held down
-			await el.press(char as KeyInput, { delay : delay})
+			await el.press(char as KeyInput, { delay: delay })
 		}
 
 		else if (shiftState === ShiftState.down as ShiftState
