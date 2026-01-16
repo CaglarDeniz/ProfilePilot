@@ -4,6 +4,41 @@ import logger from '../utils/log'
 import type { GhostCursor } from 'ghost-cursor'
 import { randomMoveAndClick, randomMoveAndInput, randomWait } from '../utils/interact'
 import type { SearchQuery } from '../utils/interests'
+import { currentProfile } from '../utils/profile'
+
+async function login(page : Page, cursor : GhostCursor | null) {
+
+	const hamburgerMenuSelector = '#slickdealsHeader__hamburgerToggle'
+	const hamburgerMenu = await page.waitForSelector(hamburgerMenuSelector)
+	await randomMoveAndClick(cursor,hamburgerMenu)
+
+	const signUpSelector = '#__nuxt > div:nth-child(2) > header > div > div > nav > ul.slickdealsHeader__iconSection > li:nth-child(4) > span > p'
+	const signUp = await page.waitForSelector(signUpSelector)
+	await randomMoveAndClick(cursor,signUp)
+
+	const loginButtonSelector = '#__nuxt > div:nth-child(2) > dialog.slickdealsModal.slickdealsModal--smallScreenDrawer.slickdealsModal--largeScreenCenter.slickdealsModal--default.slickdealsModal--noScroll > div > section.regLoginModal__mainSection > div > div.regFlowEmailStep > p.regFlowEmailStep__loginCta > a'
+	const loginButton = await page.waitForSelector(loginButtonSelector)
+	await randomMoveAndClick(cursor,loginButton)
+
+	const emailInputSelector = '#email'
+	const emailInput = await page.waitForSelector(emailInputSelector)
+
+	await randomMoveAndInput(page,cursor,emailInput,currentProfile.email)
+
+	const continueButtonSelector = '#continue'
+	const continueButton = await page.waitForSelector(continueButtonSelector)
+	await randomMoveAndClick(cursor,continueButton)
+
+	const passwordInputSelector = '#passwordInput'
+	const passwordInput = await page.waitForSelector(passwordInputSelector)
+
+	await randomMoveAndInput(page,cursor,passwordInput,currentProfile.password)
+
+	const submitButtonSelector = '#passwordLogIn'
+	const submitButton = await page.waitForSelector(submitButtonSelector)
+
+	await randomMoveAndClick(cursor,submitButton)
+}
 
 async function navigateToSite(page: Page, cursor: GhostCursor | null) {
 	logger.trace("Navigating to site",{site : "https://slickdeals.net"});
@@ -67,6 +102,7 @@ async function searchForItem(page: Page, cursor: GhostCursor | null, query: Sear
 }
 
 const SlickDeals: ProfileAgent = {
+	login : login,
 	navigateToSite: navigateToSite,
 	addItemToCart: addItemToCart,
 	goToSearchbox: goToSearchbox,

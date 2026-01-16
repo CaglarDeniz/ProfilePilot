@@ -4,6 +4,29 @@ import logger from '../utils/log'
 import type { GhostCursor } from 'ghost-cursor'
 import { randomMoveAndClick, randomMoveAndInput, randomWait } from '../utils/interact'
 import type { SearchQuery } from '../utils/interests'
+import { currentProfile } from '../utils/profile'
+
+async function login(page : Page, cursor : GhostCursor | null) {
+
+	const loginButtonSelector = '#__next > div.MuiContainer-root.MuiContainer-disableGutters.mui-xddvw3-root > header > div > div.MuiGrid-root.MuiGrid-container.MuiGrid-direction-xs-row.MuiGrid-grid-xs-grow.mui-13amd52-noWrap > a.MuiButtonBase-root.MuiButton-root.MuiButton-outlined.MuiButton-outlinedPrimary.MuiButton-sizeSmall.MuiButton-outlinedSizeSmall.MuiButton-colorPrimary.MuiButton-disableElevation.MuiButton-root.MuiButton-outlined.MuiButton-outlinedPrimary.MuiButton-sizeSmall.MuiButton-outlinedSizeSmall.MuiButton-colorPrimary.MuiButton-disableElevation.mui-ohu4bn-hideSmDown-loginButton'
+	const loginButton = await page.waitForSelector(loginButtonSelector)
+	await randomMoveAndClick(cursor,loginButton)
+
+	const emailInputSelector = '#\:r0\:'
+	const emailInput = await page.waitForSelector(emailInputSelector)
+
+	await randomMoveAndInput(page,cursor,emailInput,currentProfile.email)
+
+	const passwordInputSelector = '#\:r1\:'
+	const passwordInput = await page.waitForSelector(passwordInputSelector)
+
+	await randomMoveAndInput(page,cursor,passwordInput,currentProfile.password)
+
+	const submitButtonSelector = '#root > div > div > main > div > div > div > div > div > form > div.FormBody_root__gRO7- > div:nth-child(2) > div.LoginForm_bottomSpacingMd__e2Mnm > span > button'
+	const submitButton = await page.waitForSelector(submitButtonSelector)
+
+	await randomMoveAndClick(cursor,submitButton)
+}
 
 async function navigateToSite(page: Page, cursor: GhostCursor | null) {
 	logger.trace("Navigating to site",{site : "https://shutterstock.com"});
@@ -65,6 +88,7 @@ async function searchForItem(page: Page, cursor: GhostCursor | null, query: Sear
 }
 
 const ShutterStock: ProfileAgent = {
+	login : login,
 	navigateToSite: navigateToSite,
 	addItemToCart: addItemToCart,
 	goToSearchbox: goToSearchbox,

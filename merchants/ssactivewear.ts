@@ -2,9 +2,35 @@ import { ElementHandle, Page } from 'puppeteer'
 import type { ProfileAgent } from './interface'
 import logger from '../utils/log'
 import type { GhostCursor } from 'ghost-cursor'
-import { randomMoveAndClick, randomMoveAndInput, randomWait } from '../utils/interact'
+import { randomMove, randomMoveAndClick, randomMoveAndInput, randomWait } from '../utils/interact'
 import type { SearchQuery } from '../utils/interests'
+import { currentProfile } from '../utils/profile'
 
+async function login(page : Page, cursor : GhostCursor | null) {
+
+	const loginDropdownSelector = '#loginBorderBox > span'
+	const loginDropdown = await page.waitForSelector(loginDropdownSelector)
+	await randomMove(cursor,loginDropdown)
+
+	const loginButtonSelector = '#loginDropdown > a:nth-child(1)'
+	const loginButton = await page.waitForSelector(loginButtonSelector)
+	await randomMoveAndClick(cursor,loginButton)
+
+	const emailInputSelector = '#M_M_zEmailTB'
+	const emailInput = await page.waitForSelector(emailInputSelector)
+
+	await randomMoveAndInput(page,cursor,emailInput,currentProfile.email)
+
+	const passwordInputSelector = '#M_M_zPasswordTB'
+	const passwordInput = await page.waitForSelector(passwordInputSelector)
+
+	await randomMoveAndInput(page,cursor,passwordInput,currentProfile.password)
+
+	const submitButtonSelector = '#M_M_zPageLoginBTN'
+	const submitButton = await page.waitForSelector(submitButtonSelector)
+
+	await randomMoveAndClick(cursor,submitButton)
+}
 async function navigateToSite(page: Page, cursor: GhostCursor | null) {
 	logger.trace("Navigating to site",{site : "https://www.ssactivewear.com"});
 	await page.goto('https://www.ssactivewear.com', { waitUntil : 'networkidle2'})
@@ -65,6 +91,7 @@ async function searchForItem(page: Page, cursor: GhostCursor | null, query: Sear
 }
 
 const SSActiveWear: ProfileAgent = {
+	login : login,
 	navigateToSite: navigateToSite,
 	addItemToCart: addItemToCart,
 	goToSearchbox: goToSearchbox,

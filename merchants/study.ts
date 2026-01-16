@@ -4,6 +4,29 @@ import logger from '../utils/log'
 import type { GhostCursor } from 'ghost-cursor'
 import { randomMoveAndClick, randomMoveAndInput, randomWait } from '../utils/interact'
 import type { SearchQuery } from '../utils/interests'
+import { currentProfile } from '../utils/profile'
+
+async function login(page : Page, cursor : GhostCursor | null) {
+
+	const loginButtonSelector = '#homepage2024Main > nav > div.study-nav__main > div.study-nav__main-actions.reg-cta__nav-container > div.login-container > a'
+	const loginButton = await page.waitForSelector(loginButtonSelector)
+	await randomMoveAndClick(cursor,loginButton)
+
+	const emailInputSelector = '#emailAddress'
+	const emailInput = await page.waitForSelector(emailInputSelector)
+
+	await randomMoveAndInput(page,cursor,emailInput,currentProfile.email)
+
+	const passwordInputSelector = '#pwd'
+	const passwordInput = await page.waitForSelector(passwordInputSelector)
+
+	await randomMoveAndInput(page,cursor,passwordInput,currentProfile.password)
+
+	const submitButtonSelector = '#loginForm > button'
+	const submitButton = await page.waitForSelector(submitButtonSelector)
+
+	await randomMoveAndClick(cursor,submitButton)
+}
 
 async function navigateToSite(page: Page, cursor: GhostCursor | null) {
 	logger.trace("Navigating to site",{site : "https://study.com"});
@@ -62,6 +85,7 @@ async function searchForItem(page: Page, cursor: GhostCursor | null, query: Sear
 }
 
 const Study: ProfileAgent = {
+	login : login,
 	navigateToSite: navigateToSite,
 	addItemToCart: addItemToCart,
 	goToSearchbox: goToSearchbox,
