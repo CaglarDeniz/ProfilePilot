@@ -5,10 +5,10 @@ import options from './utils/cli'
 import { getCursor } from './utils/interact'
 import { installMouseHelper } from 'ghost-cursor'
 import { getRandomInterest, getRandomQueryForInterest, interestToWebsite, type Interest } from './utils/interests'
-import { wait } from './utils/misc'
 import { withContext } from '@logtape/logtape'
 import { currentProfile } from './utils/profile'
 import logger from './utils/log'
+import PuppeteerHar from 'puppeteer-har'
 
 // Set defaults
 puppeteerExtra.use(StealthPlugin())
@@ -54,6 +54,8 @@ for (const interest of interests) {
 
 				const page = await browser.newPage({ type: 'tab' })
 
+				const har = new PuppeteerHar(page)
+
 				// Install mouse helper for debugging
 				await installMouseHelper(page);
 
@@ -68,11 +70,16 @@ for (const interest of interests) {
 				// Create a cursor to navigate this site
 				const cursor = getCursor(page)
 
+				// Start recording network events
+				await har.start({
+					path: `logs/${new Date(Date.now()).toISOString()}-${websiteURL}.har`
+				})
+
 				try {
 
 					await agent.navigateToSite(page, cursor)
 
-					await agent.login(page, cursor);
+					// await agent.login(page, cursor);
 
 					await agent.goToSearchbox(page, cursor)
 
@@ -92,12 +99,16 @@ for (const interest of interests) {
 					// Close the tab when done
 					await page.close();
 				} catch (err) {
-					logger.error(`Encountered error while interacting with website. Moving on...`, { error: err, stack : (err as any)?.stack })
+					logger.error(`Encountered error while interacting with website. Moving on...`, { error: err, stack: (err as any)?.stack })
 					return
+				} finally {
+					await har.stop();
 				}
 			})
 		}
 
 	}
-
 }
+
+// Cleanup
+await browser.close();
