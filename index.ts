@@ -9,6 +9,7 @@ import { withContext } from '@logtape/logtape'
 import { currentProfile } from './utils/profile'
 import logger from './utils/log'
 import PuppeteerHar from 'puppeteer-har'
+import sanitize from 'sanitize-filename'
 
 // Set defaults
 puppeteerExtra.use(StealthPlugin())
@@ -54,7 +55,6 @@ for (const interest of interests) {
 
 				const page = await browser.newPage({ type: 'tab' })
 
-				const har = new PuppeteerHar(page)
 
 				// Install mouse helper for debugging
 				await installMouseHelper(page);
@@ -70,14 +70,20 @@ for (const interest of interests) {
 				// Create a cursor to navigate this site
 				const cursor = getCursor(page)
 
-				// Start recording network events
-				await har.start({
-					path: `logs/${new Date(Date.now()).toISOString()}-${websiteURL}.har`
-				})
+				const har = new PuppeteerHar(page)
 
 				try {
 
 					await agent.navigateToSite(page, cursor)
+
+					// Start recording network events
+					// We are required to sanitize the filename as 
+					// websiteURL may contain characters (like /,\, etc.)
+					// that trips up the writeFile logic used by 
+					// PuppeteerHar
+					await har.start({
+						path: 'logs/' + sanitize(`${new Date(Date.now()).toISOString()}-${websiteURL}.har`)
+					})
 
 					// await agent.login(page, cursor);
 
@@ -96,13 +102,18 @@ for (const interest of interests) {
 						})
 					}
 
-					// Close the tab when done
-					await page.close();
 				} catch (err) {
 					logger.error(`Encountered error while interacting with website. Moving on...`, { error: err, stack: (err as any)?.stack })
 					return
 				} finally {
+					// Finish recording
 					await har.stop();
+
+					// Close the tab when done
+					// It is important to not close the page before the HAR recording is stopped
+					// If not, the HAR cleanup will fail due to trying to detach from a CDP session
+					// that has already been closed/destroyed when the page was closed
+					await page.close();
 				}
 			})
 		}
