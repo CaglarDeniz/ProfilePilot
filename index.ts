@@ -4,7 +4,7 @@ import { websiteToAgent } from './merchants/websites'
 import options from './utils/cli'
 import { getCursor } from './utils/interact'
 import { installMouseHelper } from 'ghost-cursor'
-import { getRandomInterest, getRandomQueryForInterest, interestToWebsite, type Interest } from './utils/interests'
+import { getRandomQueryForInterest, interestToWebsite, type Interest } from './utils/interests'
 import { withContext } from '@logtape/logtape'
 import { currentProfile } from './utils/profile'
 import logger from './utils/log'
@@ -16,18 +16,11 @@ puppeteerExtra.use(StealthPlugin())
 
 let browser = await puppeteerExtra.launch({
 	headless: options?.headless,
-	slowMo: options?.slowmo ? 250 : undefined
+	slowMo: options?.slowmo ? 250 : undefined,
+	userDataDir : options?.profile_dir
 })
 
-let interests: Interest[] = []
-
-if (options.randomInterests) {
-	interests.push(getRandomInterest())
-}
-
-if (options.interests) {
-	interests = options.interests
-}
+let interests: Interest[]  = options.interests
 
 for (const interest of interests) {
 
