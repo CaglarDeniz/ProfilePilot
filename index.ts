@@ -20,6 +20,11 @@ let browser = await puppeteerExtra.launch({
 	userDataDir : options?.profile_dir
 })
 
+// Set cookies if they exist
+if(options.cookies){
+	await browser.setCookie(options.cookies)
+}
+
 let interests: Interest[]  = options.interests
 
 for (const interest of interests) {
@@ -47,7 +52,6 @@ for (const interest of interests) {
 				}
 
 				const page = await browser.newPage({ type: 'tab' })
-
 
 				// Install mouse helper for debugging
 				await installMouseHelper(page);

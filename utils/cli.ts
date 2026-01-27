@@ -1,3 +1,4 @@
+import {type CookieData} from 'puppeteer'
 import { Command } from 'commander'
 import logger from './log';
 import { getRandomInterest } from './interests';
@@ -45,6 +46,21 @@ try {
 } catch {
 	logger.trace('User supplied profile directory does not exist')
 	process.exit()
+}
+
+if(options?.profile_dir){
+	try {
+
+		// See if a cookie file exists in the user profile
+		// directory
+		const file = Bun.file(`${options.profile_dir}/user_cookies.txt`)
+		const cookies = await file.json()
+
+		options.cookies = (cookies as CookieData[])
+
+	} catch (error){
+		logger.trace(`Found no cookie file under user profile directory. ${error}`)
+	}
 }
 
 export default options;
